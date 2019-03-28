@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    // PIXI.Texture.fromImage()，通过一个资源路径创建一个纹理对象
+    var texture = PIXI.Texture.fromImage('../assets/bunny.png');
+    console.log(texture);
+
+    //anchor属性：锚点设置纹理的原点。默认为0,0，或取自传递给构造函数的Texture
+    //pivot属性：旋转displayObject的轴心点
+    var container = new PIXI.Container();
+    app.stage.addChild(container);
+
+    var dist = 50; // 精灵间距
+    for(var i = 0; i < 25; i++) {
+        var bunny = new PIXI.Sprite(texture);
+        bunny.anchor.set(0.5);
+        bunny.x = (i%5) * dist;
+        bunny.y = Math.floor(i/5) * dist;
+        container.addChild(bunny);
+    }
+
+    // 将容器居中显示
+    container.x = app.screen.width/2;
+    container.y = app.screen.height/2;
+
+    container.pivot.x = container.width/2;
+    container.pivot.y = container.height/2;
+
+    app.ticker.add(function(delta) {
+        container.rotation += 0.01 * delta;
+    });
+</script>
+</body>
+</html>

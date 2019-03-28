@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    // 全局的缩放模式
+    // PIXI.SCALES_MODES.LINEAR：平滑缩放
+    // PIXI.SCALES_MODES.NEAREST：像素化缩放，保留像素
+    PIXI.settings.SCALE_MODE =  PIXI.SCALE_MODES.NEAREST;
+
+    // PIXI.Sprite.fromImage()，直接从一张图片的路径，创建一个精灵
+    var bunny = PIXI.Sprite.fromImage('../assets/bunny.png');
+    app.stage.addChild(bunny);
+
+    bunny.x = app.screen.width/2;
+    bunny.y = app.screen.height/2;
+    bunny.anchor.set(0.5);
+
+    bunny.interactive = true;
+    // sprite.button如果启用，鼠标光标将悬停在displayObject上时，使用指针行为（如果它是交互式的）
+    // 设置此项将"cursor"属性更改为"pointer"
+    bunny.buttonMode = true;
+
+    // click：mouse-only，只响应鼠标事件
+    // tap：touch-only，只响应触屏事件
+    // pointers：touch and mouse
+    bunny.on("pointerdown", onClick);
+
+    function onClick(e) {
+        bunny.scale.x *= 1.25;
+        bunny.scale.y *= 1.25;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    // PIXI.Sprite.fromImage()，直接从一张图片的路径，创建一个精灵
+    var bunny = PIXI.Sprite.fromImage('../assets/bunny.png');
+    app.stage.addChild(bunny);
+
+    bunny.x = app.screen.width/2;
+    bunny.y = app.screen.height/2;
+    bunny.anchor.set(0.5);
+
+    // 在app.ticker中，add方法添加需要循环的函数
+    app.ticker.add(function(delta) {
+        bunny.rotation += 0.1 * delta;
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    var texture = new PIXI.Texture.fromImage("../assets/p2.jpeg");
+
+    // tile：瓷砖
+    // 图片最好是2的整次幂
+    var tilingSprite = new PIXI.extras.TilingSprite(
+        texture,
+        app.screen.width,
+        app.screen.height
+    );
+    app.stage.addChild(tilingSprite);
+
+    var counter = 0;
+    app.ticker.add(function() {
+        counter += 0.01;
+        tilingSprite.tileScale.x = 2 + Math.sin(counter);
+        tilingSprite.tileScale.y = 2 + Math.cos(counter);
+
+        tilingSprite.tilePosition.x += 1;
+        tilingSprite.tilePosition.y += 1;
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    var spriteSheetUrl = '../assets/fighter.json';
+
+    // 公共的loader，用于加载静态资源，可以为资源定义一个名称
+    PIXI.loader
+        .add("spriteSheet", spriteSheetUrl)
+        .add("bunny", "../assets/bunny.png")
+        .load(onAssetsLoaded);
+
+    function onAssetsLoaded(loader, sources) {
+        // loader：当前的加载器
+        // sources：加载完的资源集合，可以通过定义的名称访问到单个资源
+        var bunny = new PIXI.Sprite(sources["bunny"].texture);
+        app.stage.addChild(bunny);
+        console.log(loader,sources);
+
+        // 获取spriteSheet的中序列帧的名称
+        var frames = [];
+        for(var i = 0; i < 30; i++) {
+            var val = i < 10 ? '0' + i : i;
+            // todo 好奇为什么可以直接从fromFrame()方法中，直接获取到对应的json序列帧的内容？？
+            frames.push(PIXI.Texture.fromFrame('rollSequence00' + val + '.png'));
+        }
+
+        // PIXI.extras.AnimatedSprite()方法，用来创建序列帧动画
+        var anim = new PIXI.extras.AnimatedSprite(frames);
+
+        // animatedSprite继承了PIXI.Sprite的所有属性
+        anim.anchor.set(0.5);
+        anim.x = app.screen.width/2;
+        anim.y = app.screen.height/2;
+        anim.animationSpeed = 0.6; // 播放速度
+        anim.play(); // 开始播放序列帧动画
+        app.stage.addChild(anim);
+
+        app.ticker.add(function(delta) {
+            anim.rotation += 0.01 * delta;
+        });
+    }
+</script>
+</body>
+</html>
