@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1,
+        antialias: true // 添加了抗锯齿属性！！！
+    });
+    document.body.appendChild(app.view);
+
+    // pixi绘制2d图形的api，类似canvas绘制2d图形
+    var gra = new PIXI.Graphics();
+
+    gra.beginFill(0xff0000);
+    gra.drawRect(10, 10, 50, 50);
+    gra.endFill();
+
+    // lineStyle（线段宽度，颜色，透明度）
+    // beginFill（颜色，透明度）
+    gra.lineStyle(10, 0x00ff00, 0.6);
+    gra.beginFill(0xff0000, 0.7);
+    gra.drawRect(70, 10, 50, 50);
+    gra.endFill();
+
+    // 如果不希望有描边，则需要重置lineStyle(0);
+    gra.lineStyle(0);
+    gra.beginFill(0xffff00);
+    gra.drawCircle(30, 90, 20);
+    gra.endFill();
+
+    // 椭圆
+    // gra.lineStyle(10, 0x00ff00, 0.6);
+    gra.beginFill(0xff0000, 0.5);
+    gra.drawEllipse(200, 40, 60, 30);
+    gra.endFill();
+
+    // 带圆角的矩形，第五个参数为圆角的程度
+    gra.beginFill(0xaaafb35);
+    gra.drawRoundedRect(300, 40, 50 ,50, 10);
+    gra.endFill();
+
+    // 为什么绘制星星的 drawStar() 方法从api中移除了，官网文档却还保留？？
+    // gra.lineStyle(2, 0xffffff, 1);
+    // gra.beginFill(0x273428);
+    // gra.drawStar(300, 300, 4, 3);
+    // gra.endFill();
+
+    // 绘制多边形
+    // path每两个元素形成一个二维坐标
+    var path = [150, 203, 220, 300, 300, 150];
+    gra.lineStyle(0);
+    gra.beginFill(0x00ff00, 1);
+    gra.drawPolygon(path);
+    gra.endFill();
+
+    app.stage.addChild(gra);
+</script>
+</body>
+</html>
