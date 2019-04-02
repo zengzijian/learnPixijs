@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1,
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var path = new PIXI.Graphics();
+
+    // 折线
+    path.lineStyle(2, 0xffffff, 1);
+    path.moveTo(0, 0);
+    path.lineTo(50, 100);
+    path.lineTo(100, 100);
+    path.lineTo(120, 50);
+    path.position.x = 50;
+    path.position.y = 50;
+    app.stage.addChild(path);
+
+    // 贝塞尔曲线
+    var bezier = new PIXI.Graphics();
+    bezier.lineStyle(3, 0xaa0000, 1);
+    bezier.bezierCurveTo(50, 100, 100, 100, 120, 50);
+    bezier.position.x = 50;
+    bezier.position.y = 50;
+    app.stage.addChild(bezier);
+
+    // 圆弧，arc(x, y, radius, startAngle, endAngle)，顺时针绘制
+    var arc1 = new PIXI.Graphics();
+    arc1.lineStyle(2, 0x00ff00, 1);
+    arc1.arc(200, 100, 50, Math.PI/4, Math.PI * 2);
+    app.stage.addChild(arc1);
+
+    // gra.lineTextureStyle()方法似乎已经从最新版的api中移除了
+    // gra.beginHole()和gra.endHole()也是移除了
+</script>
+</body>
+</html>

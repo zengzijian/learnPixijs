@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1,
+    });
+    document.body.appendChild(app.view);
+
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
+    // PIXI.Sprite.fromImage()，直接从一张图片的路径，创建一个精灵
+    var texture = PIXI.Texture.fromImage('../assets/bunny.png');
+
+    var container = new PIXI.Container();
+    app.stage.addChild(container);
+    container.interactive = true;
+    container.on("pointerdown", function() {
+        container.scale.x *= 1.1;
+        container.scale.y *= 1.1;
+    });
+
+    var dist = 30;
+    for(var i = 0; i < 25; i++) {
+        var bunny = new PIXI.Sprite(texture);
+        bunny.x = (i%5) * dist;
+        bunny.y = Math.floor(i/5) * dist;
+        // bunny.rotation = Math.random() * (Math.PI * 2);
+        container.addChild(bunny);
+    }
+    container.x = 100;
+    container.y = 100;
+    // container.anchor.set(0.5);
+    container.pivot.x = container.width/2;
+    container.pivot.y = container.height/2;
+    // container.rotation = Math.PI / 4;
+
+    // baseRenderTexture是一种特殊的纹理，允许任何pixijs显示对象呈现给它
+    // baseRenderTexture获取给予其render方法的任何displayObject的快照
+    // baseRenderTexture(width, height, scaleMode, resolution)
+    var brt = new PIXI.BaseRenderTexture(200, 200, PIXI.SCALE_MODES.LINEAR, 1);
+
+    // renderTexture是一种特殊的纹理，允许任何pixijs显示对象呈现给它
+    // renderTexture获取给予其render方法的任何displayObject的快照
+    // renderTexture(baseRenderTexture, frame)
+    // baseRenderTexture:用于此renderTexture的渲染器
+    // frame:要显示的纹理的矩形框架（可选）
+    var rt = new PIXI.RenderTexture(brt);
+    var sprite = new PIXI.Sprite(rt);
+    sprite.x = 200;
+    sprite.y = 50;
+    // sprite.rotation = - Math.PI/4;
+    app.stage.addChild(sprite);
+
+    // renderer.render(displayObject, renderTexture);
+    app.ticker.add(function() {
+        container.rotation += 0.01;
+        app.renderer.render(container, rt);
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_grass.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    app.stage.addChild(bg);
+
+    app.stop(); // 停止渲染直到加载完毕
+    var filter;
+    // todo 怎么更新噪声filter的效果？？？
+    var filter1 = new PIXI.filters.NoiseFilter();
+
+    PIXI.loader
+        .add('shader', '../assets/filter/shader.frag')
+        .load(onLoaded);
+
+    function onLoaded(loader, res) {
+        // PIXI.Filter(vertexShader, fragmentShader) 创建一对着色器
+        filter = new PIXI.Filter(null, res.shader.data);
+        // 一个精灵sprite可以添加多个filters
+        bg.filters = [filter, filter1];
+        app.start();// 重启应用更新
+    }
+
+    app.ticker.add(function(delta) {
+        // 更新着色器中的uniform属性
+        filter.uniforms.customUniform += 0.04 * delta;
+    });
+</script>
+</body>
+</html>

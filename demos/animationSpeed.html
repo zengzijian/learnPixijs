@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    app.stop();
+
+    PIXI.loader
+        .add('spritesheet', '../assets/0123456789.json')
+        .load(onAssetsLoaded);
+
+    function onAssetsLoaded(loader, res) {
+        var textures = [];
+        var data = res.spritesheet.data;
+        // 通过PIXI.Texture.fromFrame('序列帧的名字')，将json数据中的frames创建成texture
+        for(var i in data.frames) {
+            var texture = new PIXI.Texture.fromFrame(i);
+            // time是json数据中序列帧自带的duration时间
+            // 随着duration值变小，动画播放的速率变快
+            var time = data.frames[i].duration;
+            console.log(i, time);
+            textures.push({texture, time});
+        }
+
+        // PIXI.extras.AnimatedSprite(texture:Array)传入一个textures数组
+        var sprite = new PIXI.extras.AnimatedSprite(textures);
+        sprite.x = app.screen.width/2;
+        sprite.y = app.screen.height/2;
+        sprite.anchor.set(0.5); // 锚点
+        sprite.scale.set(2);
+        sprite.animationSpeed = 0.5; // 此处调整的速度，是序列帧动画整体的速度！！！
+        sprite.play();
+        app.stage.addChild(sprite);
+
+        app.start();
+    }
+</script>
+</body>
+</html>

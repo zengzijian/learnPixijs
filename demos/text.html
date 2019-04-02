@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    //
+    window.WebFontConfig = {
+        google: {
+            families:[
+                'Snippet',
+                'Arvo:700italic',
+                'Podkova:700'
+            ]
+        },
+        active: function() {
+            init();
+        }
+    };
+
+    // 立即执行函数，异步加载一个脚本
+    (function() {
+        var wf = document.createElement("script");
+        wf.src = ("https:" === document.location.protocol ? "https" : "http")+
+                "://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js";
+        wf.type = "text/javascript";
+        wf.async = "true"; // 异步！
+
+        // 将新创建的脚本添加到第一个script节点之前
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(wf, s);
+    })();
+
+    console.log(document.location);
+
+    // init();
+    function init() {
+        PIXI.loader
+            .add("desyrel", "../assets/desyrel.xml") // xml文件中，包含了如何解析对应位图的数据
+            .load(onAssetsLoaded);
+
+        function onAssetsLoaded(loader,res) {
+            var bitmapFontText = new PIXI.extras.BitmapText(
+                'bitmap fonts are\n now supported!',
+                {
+                    // todo 为什么把font拆成fontSize , fontFamily单独说明，会报错？？？
+                    font: '20px Desyrel',
+                    align: 'right'
+                }
+            )
+            // textWidth：是整个文字区域的宽度
+            bitmapFontText.x = app.screen.width - bitmapFontText.textWidth - 20;
+            bitmapFontText.y = 20;
+            app.stage.addChild(bitmapFontText);
+        }
+
+        var bg = new PIXI.Sprite.fromImage("../assets/bg_text.jpg");
+        bg.width = app.screen.width;
+        bg.height = app.screen.height;
+        app.stage.addChild(bg);
+
+        var textSample = new PIXI.Text('Pixi.js can has\n multiline text!', {
+            fontFamily: "Snippet",
+            fontSize: 20,
+            fill: 'white',
+            align: 'left'
+        });
+        textSample.position.set(20);
+
+        var spinningText = new PIXI.Text('I\'m fun!', {
+            fontWeight: "bold",
+            fontSize: 30,
+            fontFamily: "Arial",
+            fill:"#cc00ff",
+            align:"center",
+            stroke:"#ffffff",
+            strokeThickness: 3 // 【thickness!!】
+        });
+        spinningText.anchor.set(0.5);
+        spinningText.x = app.screen.width/2;
+        spinningText.y = app.screen.height/2;
+
+        var count = 0;
+
+        var countingText = new PIXI.Text('COUNT 4EVAR: ' + count, {
+            fontWeight: 'bold',
+            fontStyle: 'italic',
+            fontSize: 30,
+            fontFamily: 'Arvo',
+            fill: '#3e1707',
+            align: 'center',
+            stroke: '#a4410e',
+            strokeThickness: 4
+        });
+        countingText.x = app.screen.width/2;
+        countingText.y = 250;
+        countingText.anchor.x = 0.5;
+
+        app.stage.addChild(textSample, spinningText, countingText);
+
+        app.ticker.add(function() {
+            count+=0.05;
+            countingText.text = 'COUNT 4EVER: ' + Math.floor(count);
+
+            spinningText.rotation += 0.03;
+        });
+    }
+</script>
+</body>
+</html>

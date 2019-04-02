@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1,
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var texture = new PIXI.Texture.fromImage('../assets/bunny.png');
+
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
+    var con = new PIXI.Container();
+    app.stage.addChild(con);
+    con.x = app.screen.width/2;
+    con.y = app.screen.height/2;
+    con.rotation = Math.PI/4;
+
+    var gra = new PIXI.Graphics();
+    gra.beginFill(0xff0000);
+    gra.drawRect(0, 0, 100, 50);
+    gra.endFill();
+    gra.x = 100;
+    gra.y = 100;
+    gra.pivot.x = gra.width/2;
+    gra.pivot.y = gra.height/2;
+    addInteract(gra);
+    con.addChild(gra);
+
+    var gra1 = new PIXI.Graphics();
+    gra1.lineStyle(2, 0x0000ff);
+    gra1.beginFill(0x00ff00);
+    gra1.drawCircle(0, 0, 6);
+    gra1.endFill();
+    con.addChild(gra1);
+
+    for(var i = 0; i < 10; i++) {
+        var sprite = new PIXI.Sprite(texture);
+        sprite.anchor.set(0.5);
+        sprite.x = Math.random() * app.screen.width;
+        sprite.y = Math.random() * app.screen.height;
+        con.addChild(sprite);
+
+        addInteract(sprite);
+    }
+    // 因为con中的物体是随机摆放位置，导致容器的宽高并不固定！！！
+    console.log(con.width, con.height);
+
+    // 【注意】必须要在con中添加了物体以后，设置pivot才有用！！！
+    con.pivot.x = con.width/2;
+    con.pivot.y = con.height/2;
+    gra1.x = con.width/2;
+    gra1.y = con.height/2;
+    // app.ticker.add(function() {
+    //     con.rotation += 0.01;
+    // });
+
+    // 选中物体时，交互点与物体位置的偏移量
+    var dx = 0,
+        dy = 0;
+
+    // 为物体添加交互
+    function addInteract(displayObject) {
+        displayObject.interactive = true;
+        displayObject.buttonMode = true;
+        displayObject
+            .on("pointerdown", onDragStart)
+            .on("pointermove", onDragMove)
+            .on("pointerupoutside", onDragEnd)
+            .on("pointerup", onDragEnd);
+        //mouse: mousedown,mouseup,mouseupoutside,mousemove
+        //touch: touchstart,touchend,touchendoutside,touchmove
+    }
+
+    function onDragStart(e) {
+        this.data = e.data;
+
+        var localPos = this.data.getLocalPosition(this.parent);
+        // 计算偏移量
+        dx = localPos.x - this.x;
+        dy = localPos.y - this.y;
+        this.alpha = 0.5;
+        this.dragging = true;
+    }
+    function onDragMove(e) {
+        if(this.dragging) {
+            // 在移动move过程中，通过交互点位置和偏移量，求出物体的新位置
+            var localPos = this.data.getLocalPosition(this.parent);
+            var posX = localPos.x - dx;
+            var posY = localPos.y - dy;
+
+            this.x = posX;
+            this.y = posY;
+        }
+    }
+    function onDragEnd() {
+        this.alpha = 1;
+        this.dragging = false;
+        this.data = null;
+        dx = 0;
+        dy = 0;
+    }
+
+</script>
+</body>
+</html>

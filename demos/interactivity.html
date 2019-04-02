@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_grass.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    app.stage.addChild(bg);
+
+    var tButton = new PIXI.Texture.fromImage('../assets/button.png');
+    var tButtonDown = new PIXI.Texture.fromImage('../assets/button_down.png');
+    var tButtonOver = new PIXI.Texture.fromImage('../assets/button_over.png');
+
+    var buttonPos = [140, 100, 250, 230];
+    for(var i = 0; i < buttonPos.length/2; i++) {
+        var button = new PIXI.Sprite(tButton);
+        button.anchor.set(0.5);
+        button.x = buttonPos[i*2];
+        button.y = buttonPos[i*2+1];
+        app.stage.addChild(button);
+
+        button.interactive = true;
+        button.buttonMode = true;
+
+        button.on('pointerdown', onButtonDown)
+            .on('pointerup', onButtonUp)
+            .on('pointerover', onButtonOver)
+            // pointerupoutside：在指针设备按钮【释放】到最初注册指针的显示对象外部时触发
+            // 可以理解为，鼠标移动到物体上，按下鼠标，将鼠标移出物体，再释放鼠标
+            .on('pointerupoutside', onButtonUp)
+            .on('pointerout', onButtonOut);
+    }
+
+    function onButtonDown() {
+        console.log("button down");
+        this.isDown = true;
+        this.texture = tButtonDown;
+    }
+    function onButtonUp() {
+        console.log("button up");
+        this.isDown = false;
+        if(this.isOver) {
+            this.texture = tButtonOver;
+        } else {
+            this.texture = tButton;
+        }
+    }
+    function onButtonOver() {
+        console.log("button over");
+        this.isOver = true;
+        if(this.isDown)  return;
+        this.texture = tButtonOver;
+    }
+    function onButtonOut() {
+        console.log("button out");
+        this.isOver = false;
+        if(this.isDown) return;
+        this.texture = tButton;
+    }
+</script>
+</body>
+</html>
