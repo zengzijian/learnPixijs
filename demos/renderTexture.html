@@ -10,6 +10,65 @@
     var app = new PIXI.Application(400, 300);
     document.body.appendChild(app.view);
 
+    // 创建2个renderTexture，这些动态的纹理将用来绘制场景自己
+    var renderTexture = PIXI.RenderTexture.create(
+        app.screen.width,
+        app.screen.height
+    );
+    var renderTexture1 = PIXI.RenderTexture.create(
+        app.screen.width,
+        app.screen.height
+    );
+
+    var currentTexture = renderTexture;
+    var outputSprite = new PIXI.Sprite(currentTexture);
+    outputSprite.x = app.screen.width/2;
+    outputSprite.y = app.screen.height/2;
+    outputSprite.anchor.set(0.5);
+    app.stage.addChild(outputSprite);
+
+    var stuffCon = new PIXI.Container();
+    stuffCon.x = app.screen.width/2;
+    stuffCon.y = app.screen.height/2;
+    app.stage.addChild(stuffCon);
+
+    var path = '../assets/';
+    var fruits = [];
+    for(var i = 1; i < 9; i++) {
+        fruits.push(path+'rt_object_0' + i + '.png');
+    }
+    var items = [];
+    for(var i = 0; i < 20; i++) {
+        var item = PIXI.Sprite.fromImage(fruits[i % fruits.length]);
+        item.x = Math.random() * 200 - 100;
+        item.y = Math.random() * 200 - 100;
+        item.anchor.set(0.5);
+        item.scale.set(0.75);
+        stuffCon.addChild(item);
+        items.push(item);
+    }
+
+    var count = 0;
+
+    app.ticker.add(function(){
+        for(var i = 0; i < items.length; i++) {
+            var item = items[i];
+            item.rotation += 0.1;
+        }
+
+        count += 0.01;
+
+        var temp = renderTexture;
+        renderTexture = renderTexture1;
+        renderTexture1 = temp;
+
+        outputSprite.texture = renderTexture;
+
+        stuffCon.rotation -= 0.01;
+        outputSprite.scale.set(1 + Math.sin(count) * 0.2);
+
+        app.renderer.render(app.stage, renderTexture1, false);
+    });
 </script>
 </body>
 </html>
