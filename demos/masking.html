@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var bg = new PIXI.Sprite.fromImage("../assets/bg_rotate.jpg");
+    bg.anchor.set(0.5);
+    bg.x = app.screen.width/2;
+    bg.y = app.screen.height/2;
+    app.stage.addChild(bg);
+
+    var con = new PIXI.Container();
+    con.x = app.screen.width/2;
+    con.y = app.screen.height/2;
+    con.scale.set(0.5);
+    app.stage.addChild(con);
+
+    var bgFront = new PIXI.Sprite.fromImage("../assets/bg_scene_rotate.jpg");
+    bgFront.anchor.set(0.5);
+
+    var light1 = new PIXI.Sprite.fromImage("../assets/light_rotate_1.png");
+    light1.anchor.set(0.5);
+
+   var light2 = new PIXI.Sprite.fromImage("../assets/light_rotate_2.png");
+    light2.anchor.set(0.5);
+
+   var panda = new PIXI.Sprite.fromImage("../assets/panda.png");
+    panda.anchor.set(0.5);
+
+    con.addChild(bgFront, light1, light2, panda);
+
+    var thing = new PIXI.Graphics()
+    app.stage.addChild(thing);
+    thing.x = app.screen.width/2;
+    thing.y = app.screen.height/2;
+
+    // 为displayObject设置掩码，它将对象的可见性限制为应用于它的蒙板的形状。
+    // 在pixi中，常规掩码必须是PIXI.Graphics或者PIXI.Sprite对象。
+    // 这样可以在画布中实现更快的遮罩，因为它利用了形状裁剪。
+    // 要删除掩码，将mask属性设置为null
+    con.mask = thing;
+
+    app.stage.interactive = true;
+    app.stage.on("pointertap", function() {
+        if(con.mask) {
+            con.mask = null;
+        } else {
+            con.mask = thing;
+        }
+    })
+
+    var count = 0;
+    var a = 10;
+
+    app.ticker.add(function(){
+        count+=0.1;
+
+        bg.rotation += 0.01;
+        bgFront.rotation -= 0.01;
+
+        light1.rotation += 0.02;
+        light2.rotation += 0.01;
+
+        panda.scale.x = 1 + Math.sin(count) * 0.04;
+        panda.scale.y = 1 + Math.cos(count) * 0.04;
+
+        thing.clear();
+        thing.lineStyle(0)
+            .beginFill(0x8bc5ff, 0.5)
+            // 绘制闭合区域，首位是同一个点哦！
+            .moveTo(-60 + Math.sin(count) * a, -50 + Math.cos(count)*a)
+            .lineTo(60+Math.cos(count)*a, -50 + Math.sin(count)*a)
+            .lineTo(60+Math.sin(count)*a, 50 + Math.cos(count)*a)
+            .lineTo(-60+Math.cos(count)*a, 50 + Math.sin(count)*a)
+            .lineTo(-60 + Math.sin(count) * a, -50 + Math.cos(count)*a)
+            .endFill();
+        thing.rotation = count * 0.1;
+    });
+</script>
+</body>
+</html>

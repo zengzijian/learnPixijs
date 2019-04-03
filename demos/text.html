@@ -24,11 +24,12 @@
         }
     };
 
-    // 立即执行函数，异步加载一个脚本
+    // 立即执行函数，异步加载一个外部脚本
     (function() {
         var wf = document.createElement("script");
-        wf.src = ("https:" === document.location.protocol ? "https" : "http")+
-                "://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js";
+        // wf.src = ("https:" === document.location.protocol ? "https" : "http")+
+        //         "://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js";
+        wf.src = "../lib/webfont.js";
         wf.type = "text/javascript";
         wf.async = "true"; // 异步！
 

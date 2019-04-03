@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var g = new PIXI.Graphics();
+    app.stage.addChild(g);
+
+    g.beginFill(0xff3300)
+        .lineStyle(5, 0xffd900,1)
+        .moveTo(25, 25)
+        .lineTo(125, 25)
+        .lineTo(50, 50)
+        .lineTo(125, 110)
+        .lineTo(25, 110)
+        .lineTo(25, 25)
+        .endFill();
+
+    g.lineStyle(1, 0x0000ff, 1)
+        .drawRect(25, 125, 50, 50);
+
+    g.lineStyle(0)
+        .beginFill(0xffff0b, 0.5)
+        .drawCircle(235, 100, 50)
+        .endFill();
+
+    g.lineStyle(10, 0x33ff00)
+        .moveTo(15,15)
+        .lineTo(300, 150);
+
+    app.stage.interactive = true;
+    app.stage.buttonMode = true;
+
+    // 点击app.stage，绘制随机线条
+    // 【app.stage中，响应交互的是闭合图形！！线条不响应交互事件】
+    app.stage.on("pointertap", onClick);
+
+    function onClick() {
+        //绘制贝塞尔曲线
+        g.lineStyle(Math.random() * 15, Math.random() * 0xffffff)
+            .moveTo(Math.random() * app.screen.width, Math.random() * app.screen.height)
+            .bezierCurveTo(
+                Math.random() * app.screen.width, Math.random() * app.screen.height,
+                Math.random() * app.screen.width, Math.random() * app.screen.height,
+                Math.random() * app.screen.width, Math.random() * app.screen.height
+            );
+    }
+
+    // 创建一个始终运动的图形
+    // 因为thing添加在g之后，所以层级要比g图形层级高！！
+    var thing = new PIXI.Graphics()
+    app.stage.addChild(thing);
+    thing.x = app.screen.width/2;
+    thing.y = app.screen.height/2;
+
+    var count = 0;
+    var a = 10;
+
+    app.ticker.add(function(){
+        count+=0.1;
+        thing.clear();
+        thing.lineStyle(5, 0xff0000,1)
+            .beginFill(0xffff00, 0.5)
+            // 绘制闭合区域，首位是同一个点哦！
+            .moveTo(-60 + Math.sin(count) * a, -50 + Math.cos(count)*a)
+            .lineTo(60+Math.cos(count)*a, -50 + Math.sin(count)*a)
+            .lineTo(60+Math.sin(count)*a, 50 + Math.cos(count)*a)
+            .lineTo(-60+Math.cos(count)*a, 50 + Math.sin(count)*a)
+            .lineTo(-60 + Math.sin(count) * a, -50 + Math.cos(count)*a)
+            .endFill();
+        thing.rotation = count * 0.1;
+    });
+
+</script>
+</body>
+</html>

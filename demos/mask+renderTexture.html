@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    // 交互刷子，根据用户交互绘制图形。并不需要把它添加到app.stage中
+    var brush = new PIXI.Graphics();
+    brush.beginFill(0xffffff);
+    brush.drawCircle(0, 0, 20);
+
+    PIXI.loader
+        .add("t1", "../assets/bg_grass.jpg")
+        .add("t2", "../assets/bg_rotate.jpg")
+        .load(setup);
+
+    function setup(loader, res) {
+        console.log(res);
+        var bg = new PIXI.Sprite(res['t1'].texture);
+        bg.width = app.screen.width;
+        bg.height = app.screen.height;
+        app.stage.addChild(bg);
+
+        // 待展示的内容
+        var content = new PIXI.Sprite(res["t2"].texture);
+        content.width = app.screen.width;
+        content.height = app.screen.height;
+        app.stage.addChild(content);
+
+        var renderTexture = new PIXI.RenderTexture.create(app.screen.width, app.screen.height);
+        var renderSprite = new PIXI.Sprite(renderTexture);
+        app.stage.addChild(renderSprite);
+
+        // 将待展示的内容的掩码设置为renderTexture生成的精灵
+        // 由于content比bg后添加，若mask为null，则会显示完整的content
+        // 由于renderSprite一开始没有任何图形，所以content不展示
+        content.mask = renderSprite;
+
+        var dragging = false;
+
+        app.stage.interactive = true;
+        app.stage.on("pointerdown", pointerDown)
+            .on("pointermove", pointerMove)
+            .on("pointerup", pointerUp);
+
+        function pointerDown(e) {
+            dragging = true;
+            pointerMove(e);
+        }
+        function pointerMove(e) {
+            if(dragging) {
+                // 将刷子位置设置为当前交互的全局位置
+                brush.position.copy(e.data.global);
+                // renderer.render(displayObject,renderTexture,clear,tranform,skipUpdataTransform);
+                // 将对象渲染到其webgl视图
+                // displayObject: PIXI.DisplayObject,要渲染的对象
+                // renderTexture: PIXI.RenderTexture,渲染的渲染纹理
+                // clear: boolean(可选)，是否应在新渲染之前清除画布
+                // tranform:PIXI.Matrix(可选)，在渲染之前应用于渲染纹理的变换
+                // skipUpdateTransform: boolean(可选)，我们应该跳过更新转换传递吗？
+                // todo 若把clear设置为true，则始终渲染一个圆形区域
+                app.renderer.render(brush, renderTexture, false, null, false);
+            }
+        }
+        function pointerUp(e) {
+            dragging = false;
+        }
+    }
+</script>
+</body>
+</html>

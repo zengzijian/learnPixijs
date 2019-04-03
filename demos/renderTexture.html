@@ -19,25 +19,30 @@
         app.screen.width,
         app.screen.height
     );
+    console.log(renderTexture.baseTexture.uid);
+    console.log(renderTexture1.baseTexture.uid);
 
     var currentTexture = renderTexture;
+
+    // 创建用于展示renderTexture的精灵
     var outputSprite = new PIXI.Sprite(currentTexture);
     outputSprite.x = app.screen.width/2;
     outputSprite.y = app.screen.height/2;
     outputSprite.anchor.set(0.5);
     app.stage.addChild(outputSprite);
 
+    // 容器
     var stuffCon = new PIXI.Container();
     stuffCon.x = app.screen.width/2;
     stuffCon.y = app.screen.height/2;
     app.stage.addChild(stuffCon);
 
     var path = '../assets/';
-    var fruits = [];
+    var fruits = []; // 存储图片的路径
     for(var i = 1; i < 9; i++) {
         fruits.push(path+'rt_object_0' + i + '.png');
     }
-    var items = [];
+    var items = []; // 存储对应的精灵
     for(var i = 0; i < 20; i++) {
         var item = PIXI.Sprite.fromImage(fruits[i % fruits.length]);
         item.x = Math.random() * 200 - 100;
@@ -48,9 +53,12 @@
         items.push(item);
     }
 
+    // 计数，用于三角函数时间变量
     var count = 0;
 
     app.ticker.add(function(){
+
+        // 让每一个精灵都自旋转
         for(var i = 0; i < items.length; i++) {
             var item = items[i];
             item.rotation += 0.1;
@@ -58,15 +66,23 @@
 
         count += 0.01;
 
+        // 交换帧缓冲区 swap the buffers
         var temp = renderTexture;
         renderTexture = renderTexture1;
         renderTexture1 = temp;
 
+        // 输出精灵的纹理一直在交替变换，打印baseTexture.uid可以得知
         outputSprite.texture = renderTexture;
+        // console.log(outputSprite.texture.baseTexture.uid);
 
+        // 装精灵的容器旋转
+        // 输出精灵尺寸的缩放，从而可以实现放射型展示的效果！！！
+        // 两者实现扭转的效果
         stuffCon.rotation -= 0.01;
         outputSprite.scale.set(1 + Math.sin(count) * 0.2);
 
+        // 把app.stage容器都进行渲染，则outputSprite也被渲染了
+        // 输出精灵始终渲染【上一帧的效果】和【当前场景效果】的叠加结果
         app.renderer.render(app.stage, renderTexture1, false);
     });
 </script>
