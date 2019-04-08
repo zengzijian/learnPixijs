@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    app.stop();
+
+    PIXI.loader
+        .add('spritesheet', '../assets/monsters.json')
+        .load(onAssetsLoaded);
+
+    var aliens = [];
+    var alienFrames = [
+        'eggHead.png',
+        'flowerTop.png',
+        'helmlok.png',
+        'skully.png'
+    ];
+    var con = new PIXI.Container();
+    con.x = app.screen.width/2;
+    con.y = app.screen.height/2;
+    app.stage.addChild(con);
+
+    app.stage.interactive = true;
+    app.stage.buttonMode = true;
+    app.stage.on("pointertap", onClick);
+
+    function onClick() {
+        // cacheAsBitmap:如果希望将此显示对象缓存在位图中，请将其属性设为true
+        // 这基本上拍下了显示对象在那一刻的快照
+        // 它可以为复杂的静态显示对象提供性能优势
+        // 要删除此属性，只需要将其设为false
+        // 【确保所有的纹理在设置该属性为true前，已经预加载了！！】
+        con.cacheAsBitmap = !con.cacheAsBitmap;
+    }
+
+    var count = 0;
+
+    function onAssetsLoaded(loader, res) {
+        for(var i = 0; i < 100; i++) {
+            var frameName = alienFrames[i%4];
+            var alien = PIXI.Sprite.fromImage(frameName);
+            alien.tint = Math.random() * 0xffffff;
+
+            alien.anchor.set(0.5);
+            alien.x = Math.random() * 400 - 200;
+            alien.y = Math.random() * 300 - 150;
+            alien.scale.set(0.5);
+
+            aliens.push(alien);
+            con.addChild(alien);
+        }
+
+        app.start();
+    }
+
+    app.ticker.add(function() {
+        for(var i = 0; i < aliens.length; i++) {
+            var item = aliens[i];
+            item.rotation+=0.1;
+        }
+
+        count+=0.01;
+
+        con.scale.x = Math.sin(count);
+        con.scale.y = Math.sin(count);
+        con.rotation += 0.01;
+    });
+
+</script>
+</body>
+</html>

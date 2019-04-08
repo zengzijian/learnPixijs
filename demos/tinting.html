@@ -18,6 +18,8 @@
         item.anchor.set(0.5);
         item.x = Math.random() * app.screen.width;
         item.y = Math.random() * app.screen.height;
+
+        // 应用于网格的色调，默认值为0xFFFFFF
         item.tint = Math.random() * 0xFFFFFF;
         item.scale.set(0.4 + Math.random() * 0.2);
         app.stage.addChild(item);

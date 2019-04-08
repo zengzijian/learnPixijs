@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var bg = new PIXI.Sprite.fromImage("../assets/bg_rotate.jpg");
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    app.stage.addChild(bg);
+
+    var arr = [];
+    var totalNum = 20;
+    for(var i = 0; i < totalNum; i++) {
+        var item = new PIXI.Sprite.fromImage('../assets/flowerTop.png');
+        item.anchor.set(0.5);
+        item.scale.set(0.4+Math.random()*0.15);
+        item.x = Math.floor(Math.random() * app.screen.width);
+        item.y = Math.floor(Math.random() * app.screen.height);
+
+        // 混合模式
+        // webgl渲染器仅支持 NORMAL, ADD, MULTIPLY, SCREEN 4种模式
+        item.blendMode = PIXI.BLEND_MODES.ADD;
+
+        // todo ？？？
+        item.direction = Math.random() * Math.PI * 2; // 角度
+        item.turningSpeed = Math.random() - 0.8; // 角度变化的系数基数
+        item.speed = 1 + Math.random() * 1; // 圆周运动的半径
+
+        arr.push(item);
+        app.stage.addChild(item);
+    }
+
+    var boundPadding = 50;
+    // 矩形对象是由其位置定义的区域，由其左上角点（x，y）和width，height定义
+    var bound = new PIXI.Rectangle(
+        -boundPadding,
+        -boundPadding,
+        app.screen.width + boundPadding * 2,
+        app.screen.height + boundPadding * 2
+    );
+
+    app.ticker.add(function() {
+        for(var i = 0; i < arr.length; i++) {
+            var item = arr[i];
+
+            item.direction += item.turningSpeed * 0.01;
+            // 让物体绕着中心点，做圆周运动
+            item.x += Math.sin(item.direction) * item.speed;
+            item.y += Math.cos(item.direction) * item.speed;
+            // 调整sprite角度，保证sprite上方向指向圆心
+            item.rotation = -item.direction - Math.PI/2;
+
+            // 物体在接触边界时，调整圆心位置
+            if(item.x < bound.x) {
+                item.x += bound.width;
+            }
+            if(item.x > bound.x + bound.width) {
+                item.x -= bound.width;
+            }
+            if(item.y < bound.y) {
+                item.y += bound.height;
+            }
+            if(item.y > bound.y + bound.height) {
+                item.y -= bound.height;
+            }
+        }
+    });
+
+</script>
+</body>
+</html>
