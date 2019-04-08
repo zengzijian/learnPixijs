@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1,
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var texture = new PIXI.Texture.fromImage("../assets/trail.png");
+
+    var historyX = [];
+    var historyY = [];
+    var historySize = 20; // 队列中保存的坐标个数，可以理解为轨迹长度
+    var ropeSize = 100; // 队列中2个坐标点之间插值的个数，可以理解为轨迹的平滑度
+    var points = []; // 保存PIXI.Point类型的点，作为mesh.Rope的控制点
+    for (var i = 0; i < historySize; i++) {
+        historyX.push(0);
+        historyY.push(0);
+    }
+    for(var i = 0; i < ropeSize; i++) {
+        points.push(new PIXI.Point(0,0));
+    }
+
+    var rope = new PIXI.mesh.Rope(texture, points);
+    rope.blendMode = PIXI.BLEND_MODES.ADD;
+    app.stage.addChild(rope);
+
+    app.ticker.add(function() {
+        // 获取mouse当前的全局坐标
+        // 如果不监听mouse事件，可以通过这个renderer.plugins.interaction得到交互的数据
+        var mouse = app.renderer.plugins.interaction.mouse.global;
+
+        // 形成一个反向的队列，从队列头部插入元素，因为要控制mesh.Rope元素纹理的显示
+        historyX.pop();
+        historyX.unshift(mouse.x);
+        historyY.pop();
+        historyY.unshift(mouse.y);
+
+        // historyX.shift();
+        // historyX.push(mouse.x);
+        // historyY.shift();
+        // historyY.push(mouse.y);
+
+        for(var i = 0; i < ropeSize; i++) {
+            var p = points[i];
+
+            // 获取到样条曲线中平滑的插值
+            var ix = cubicInterpolation(historyX, i / ropeSize * historySize);
+            var iy = cubicInterpolation(historyY, i / ropeSize * historySize);
+
+            p.x = ix;
+            p.y = iy;
+        }
+
+    });
+
+    // 获取样条曲线的方法
+    // 可以参考 https://github.com/osuushi/Smooth.js
+    function clipInput(k, arr)
+    {
+        if (k < 0)
+            k = 0;
+        if (k > arr.length - 1)
+            k = arr.length - 1;
+        return arr[k];
+    }
+
+    function getTangent(k, factor, array)
+    {
+        return factor * (clipInput(k + 1, array) - clipInput(k - 1,array)) / 2;
+    }
+
+    function cubicInterpolation(array, t, tangentFactor)
+    {
+        if (tangentFactor == null) tangentFactor = 1;
+
+        var k = Math.floor(t);
+        var m = [getTangent(k, tangentFactor, array), getTangent(k + 1, tangentFactor, array)];
+        var p = [clipInput(k,array), clipInput(k+1,array)];
+        t -= k;
+        var t2 = t * t;
+        var t3 = t * t2;
+        return (2 * t3 - 3 * t2 + 1) * p[0] + (t3 - 2 * t2 + t) * m[0] + ( -2 * t3 + 3 * t2) * p[1] + (t3 - t2) * m[1];
+    }
+
+</script>
+</body>
+</html>

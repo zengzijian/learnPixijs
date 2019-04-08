@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_plane.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    var cells = new PIXI.Sprite.fromImage('../assets/cells.png');
+    cells.width = app.screen.width;
+    cells.height = app.screen.height;
+    var mask = new PIXI.Sprite.fromImage('../assets/flowerTop.png');
+    mask.scale.set(0.6);
+    mask.anchor.set(0.5);
+    mask.x = 150;
+    mask.y = 90;
+
+    cells.mask = mask;
+
+    app.stage.addChild(bg,cells,mask);
+
+    var target = new PIXI.Point();
+
+    reset();
+    reset();
+
+    function reset() {
+        target.x = Math.floor(Math.random() * app.screen.width);
+        target.y = Math.floor(Math.random() * app.screen.height)
+    }
+
+    app.ticker.add(function() {
+        mask.x += (target.x - mask.x) * 0.1;
+        mask.y += (target.y - mask.y) * 0.1;
+
+        if(Math.abs(mask.x - target.x) < 1) {
+            reset();
+        }
+
+    });
+
+</script>
+</body>
+</html>
