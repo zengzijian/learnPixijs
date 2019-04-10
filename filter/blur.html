@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_depth_blur.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    app.stage.addChild(bg);
+
+    var item = new PIXI.Sprite.fromImage('../assets/depth_blur_dudes.jpg');
+    item.anchor.set(0.5);
+    item.x = app.screen.width/2;
+    item.y = app.screen.height/2;
+    item.scale.set(0.5);
+    app.stage.addChild(item);
+
+    var item1 = new PIXI.Sprite.fromImage('../assets/depth_blur_moby.jpg');
+    item1.anchor.set(0.5);
+    item1.x = app.screen.width/2 - 10;
+    item1.y = app.screen.height/2;
+    item1.scale.set(0.5);
+    app.stage.addChild(item1);
+
+    var blurFilter1 = new PIXI.filters.BlurFilter();
+    var blurFilter2 = new PIXI.filters.BlurFilter();
+
+    item.filters = [blurFilter1];
+    item1.filters = [blurFilter2];
+
+    var count = 0;
+    var ratio = 20; // blur的程度
+
+    app.ticker.add(function() {
+        count += 0.01;
+
+        // 此处修改的是filter属性
+        blurFilter1.blur = ratio * Math.sin(count);
+        blurFilter2.blur = ratio * Math.cos(count);
+    });
+
+</script>
+</body>
+</html>

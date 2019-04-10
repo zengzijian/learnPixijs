@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    // PIXI.filters.ColorMatrixFilter，允许对displayObject上每个像素的RGBA颜色和alpha值
+    // 应用5X4的矩阵变化，以生成具有一组新RGBA颜色和alpha值的结果
+    // 【好像很强大的？！】
+    // 可以调用的方法：
+    // blackAndWhite:黑白效果
+    // brightness:亮度
+    // browni:棕色滤镜
+    // desaturate:降低饱和度
+    // saturate:增强饱和度
+    // greyscale:灰度
+    // hue:色调
+    // kodachrome:柯达彩色胶片
+    // lsd:迷幻
+    // negative:反向图片颜色
+    // night:夜色
+    // polaroid:偏振片
+    // predator:捕食者？？？
+    // sepia:乌贼墨色
+    // technicolor:彩色
+    // toBGR: red->blue, blue->red
+    // vintage:复古
+    // contrast:对比度
+
+    var filter = new PIXI.filters.ColorMatrixFilter();
+
+    var con = new PIXI.Container();
+    con.x = app.screen.width/2;
+    con.y = app.screen.height/2;
+    con.scale.set(0.5);
+    app.stage.addChild(con);
+
+    var bgFront = new PIXI.Sprite.fromImage("../assets/bg_scene_rotate.jpg");
+    bgFront.anchor.set(0.5);
+
+    var l1 = new PIXI.Sprite.fromImage('../assets/light_rotate_1.png');
+    l1.anchor.set(0.5);
+    var l2 = new PIXI.Sprite.fromImage('../assets/light_rotate_2.png');
+    l2.anchor.set(0.5);
+
+    var panda = new PIXI.Sprite.fromImage('../assets/panda.png');
+    panda.anchor.set(0.5);
+
+    con.addChild(bgFront, l1, l2, panda);
+
+    con.filters = [filter]
+    console.log(filter.matrix);
+
+    var count = 0;
+    var enabled = true;
+
+    app.stage.interactive = true;
+    app.stage.on("pointertap", function() {
+        enabled = !enabled;
+        con.filters = enabled ? [filter] : null;
+    });
+
+    app.ticker.add(function(){
+        count+=0.1;
+
+        bgFront.rotation -= 0.01;
+        l1.rotation += 0.01;
+        l2.rotation += 0.02;
+
+        panda.scale.x = 1 + Math.sin(count) * 0.04;
+        panda.scale.y = 1 + Math.cos(count) * 0.04;
+
+        var m = filter.matrix;
+        var matrix = filter.matrix;
+
+        matrix[1] = Math.sin(count) * 3;
+        matrix[2] = Math.cos(count);
+        matrix[3] = Math.cos(count) * 1.5;
+        matrix[4] = Math.sin(count / 3) * 2;
+        matrix[5] = Math.sin(count / 2);
+        matrix[6] = Math.sin(count / 4);
+
+    });
+
+</script>
+</body>
+</html>

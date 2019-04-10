@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_grass.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    app.stage.addChild(bg);
+
+    var fragmentShader = `
+        precision mediump float;
+        uniform vec2 u_mouse;
+        uniform vec2 u_resolution;
+        void main() {
+            vec2 pixelPos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
+            if(length(u_mouse - pixelPos) < 25.0) {
+                gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0) * 0.7;
+            } else {
+                gl_FragColor = vec4(0.0, u_mouse.x/u_resolution.x, u_mouse.y/u_resolution.y, 1) * 0.5;
+            }
+        }
+    `;
+
+    var con = new PIXI.Container();
+    // filterArea:应用滤镜的区域。这更像是一种优化
+    // 而不是计算每一个可以设置这个矩形的帧的displayObject的尺寸
+    // 也可以用作交互掩码
+    con.filterArea = app.screen;
+    app.stage.addChild(con);
+
+    var filter = new PIXI.Filter(null, fragmentShader);
+    con.filters = [filter];
+
+    app.ticker.add(function() {
+        var v2 = filter.uniforms.u_mouse;
+        var global = app.renderer.plugins.interaction.mouse.global;
+        v2[0] = global.x;
+        v2[1] = global.y;
+        filter.uniforms.u_mouse = v2;
+
+        v2 = filter.uniforms.u_resolution;
+        v2[0] = app.screen.width;
+        v2[1] = app.screen.height;
+        filter.uniforms.u_resolution = v2;
+    });
+</script>
+</body>
+</html>

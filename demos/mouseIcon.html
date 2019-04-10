@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    // todo 需要在字符串后设置auto，这个属性有什么作用，如果删掉则有问题！！！
+    var defaultIcon = 'url("../assets/bunny.png"),auto';
+    var hoverIcon = 'url("../assets/bunny_saturated.png"),auto';
+
+    app.renderer.plugins.interaction.cursorStyles.default = defaultIcon;
+    app.renderer.plugins.interaction.cursorStyles.hover = hoverIcon;
+
+    var g = new PIXI.Graphics();
+    app.stage.addChild(g);
+
+    g.beginFill(0xff3300)
+        .lineStyle(5, 0xffd900,1)
+        .moveTo(25, 25)
+        .lineTo(150, 25)
+        .lineTo(150, 100)
+        .lineTo(25, 100)
+        .lineTo(25, 25)
+        .endFill();
+
+    g.interactive = true;
+    g.buttonMode = true;
+
+    // 定义了当鼠标光标悬停在displayObject上时使用的光标模式
+    g.cursor = 'hover';
+    g.on('pointertap', function() {
+        console.log("select");
+    });
+
+</script>
+</body>
+</html>

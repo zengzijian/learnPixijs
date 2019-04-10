@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300, {
+        backgroundColor: 0x5ba6f1
+    });
+    document.body.appendChild(app.view);
+
+    PIXI.loader
+        .add("eggHead", '../assets/eggHead.png')
+        .add("flowerTop", '../assets/flowerTop.png')
+        .add("helmlok", '../assets/helmlok.png')
+        .add("skully", '../assets/skully.png')
+        .load(onAssetsLoaded);
+
+    var REEL_WIDTH = 80; // 5列
+    var SYMBOL_SIZE = 75;
+
+    function onAssetsLoaded(loader, res) {
+        var textures = [
+            new PIXI.Texture.fromImage('eggHead'),
+            new PIXI.Texture.fromImage('flowerTop'),
+            new PIXI.Texture.fromImage('helmlok'),
+            new PIXI.Texture.fromImage('skully')
+        ];
+
+        // 创建滑动条
+        var reels = [];
+        var reelCon = new PIXI.Container();
+        app.stage.addChild(reelCon);
+        for (var i = 0; i < 5; i++) {
+            var rc = new PIXI.Container();
+            rc.x = i * REEL_WIDTH;
+            reelCon.addChild(rc);
+
+            var reel = {
+                container: rc,
+                symbols:[],
+                position: 0,
+                previousPosition: 0
+            };
+
+            for(var j = 0; j<4; j++) {
+                var symbol = new PIXI.Sprite(textures[Math.floor(Math.random() * textures.length)]);
+                // symbol.y = j * SYMBOL_SIZE;
+                // symbol.scale.x = symbol.scale.y = Math.min(SYMBOL_SIZE/symbol.width, SYMBOL_SIZE/symbol.height);
+                // symbol.x = Math.round((SYMBOL_SIZE - symbol.width)/2);
+                symbol.anchor.set(0.5);
+                symbol.width *= SYMBOL_SIZE/symbol.height;
+                symbol.height = SYMBOL_SIZE;
+                symbol.y = (j+0.5) * SYMBOL_SIZE;
+                symbol.x = REEL_WIDTH/2;
+
+                reel.symbols.push(symbol);
+                rc.addChild(symbol);
+            }
+        }
+
+        var margin = (app.screen.height - SYMBOL_SIZE*3)/2;
+        reelCon.y = margin;
+        // reelCon.x = (app.screen.width - REEL_WIDTH *5)/2;
+
+        var top = new PIXI.Graphics();
+        top.beginFill(0x000000, 1);
+        top.drawRect(0, 0, app.screen.width, margin);
+        top.endFill();
+        var bottom = new PIXI.Graphics();
+        bottom.beginFill(0x000000, 1);
+        bottom.drawRect(0, SYMBOL_SIZE*3+margin, app.screen.width, margin);
+        bottom.endFill();
+
+        app.stage.addChild(top, bottom);
+
+        // text
+        var style = new PIXI.TextStyle({
+            fontFamily:"Arial",
+            fontSize: 18,
+            fontStyle:'italic',
+            fontWeight:'bold',
+            fill:['#ffffff', '#00ff99'],
+            stroke: '#4a1850',
+            strokeThickness: 2
+        })
+        var text = new PIXI.Text("Spin the wheel!", style);
+        text.x = Math.round((bottom.width - text.width)/2);
+        text.y = Math.round(app.screen.height - (margin + text.height)/2);
+        bottom.addChild(text);
+
+        bottom.interactive = true;
+        bottom.buttonMode = true;
+        bottom.on('pointerdown', startPlay);
+
+        var isRunning = false;
+
+        function startPlay() {
+            console.log("play");
+            if(isRunning) return;
+            isRunning = true;
+
+            for (var i = 0; i < reels.length; i++) {
+                var r = reels[i];
+                var extra = Math.floor(Math.random() * 3); // ???
+                // tweenTo({
+                //     object: r,
+                //     property: "position",
+                //     target: r.position +
+                // })
+
+            }
+
+        }
+
+        function reelsComplete() {
+            isRunning = false;
+        }
+
+        app.ticker.add(function(delta) {
+            for (var i = 0; i < reels.length; i++) {
+                var r = reels[i];
+                r.previousPosition = r.position;
+
+                for (var j = 0; j < r.symbols.length; j++) {
+                    var s = r.symbols[j];
+                }
+
+            }
+        });
+
+
+    }
+
+    // 一个简易的动画库
+    var tweening = [];
+    function tweenTo(p) {
+        var tween = {
+            object: p.object,
+            property:p.property,
+            propertyBeginValue:p.object[p.property],
+            target:p.target,
+            easing:p.easing,
+            time:p.time,
+            change:p.onChange,
+            complete:p.onComplete,
+            start:Date.now()
+        };
+        tweening.push(tween);
+        return tween;
+    }
+    // 监听动画更新
+    app.ticker.add(function(delta) {
+        var now = Date.now();
+        var remove = [];
+        for (var i = 0; i < tweening.length; i++) {
+            var t = tweening[i];
+            var phare = Math.min(1, (now - t.start)/t.time); // 阶段？？
+
+            t.object[t.property] = lerp(t.propertyBeginValue, t.target, t.easing(phare));
+            if(t.change) t.change(t);
+            if(phare === 1) {
+                t.object[t.property] = t.target;
+                if(t.complete) t.complete();
+                remove.push(t);
+            }
+        }
+        for(var i = 0; i < remove.length;i++) {
+            tweening.splice(tweening.indexOf(remove[i]), 1);
+        }
+    });
+
+    /**
+     * 线性插值函数
+     * @param a1 起点
+     * @param a2 终点
+     * @param t 比例
+     * @returns {number}
+     */
+    function lerp(a1, a2, t) {
+        return a1*(1-t) + a2*t;
+    }
+
+    //Backout function from tweenjs.
+    //https://github.com/CreateJS/TweenJS/blob/master/src/tweenjs/Ease.js
+    function backout(amount) {
+        return function(t) {
+            return (--t*t*((amount+1)*t+amount)+1);
+        }
+    }
+
+
+</script>
+</body>
+</html>
