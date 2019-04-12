@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    var texture;
+    PIXI.loader.add("flowerTop", "../assets/flowerTop.png")
+        .load(function(loader, res) {
+            texture = res['flowerTop'].texture;
+            init();
+        });
+
+    function init() {
+
+    }
+</script>
+</body>
+</html>

@@ -32,23 +32,36 @@
     // filterArea:应用滤镜的区域。这更像是一种优化
     // 而不是计算每一个可以设置这个矩形的帧的displayObject的尺寸
     // 也可以用作交互掩码
-    con.filterArea = app.screen;
+    var rect = new PIXI.Rectangle(0, 0, 200, 150);
+    rect.x = 50;
+    rect.y = 50;
+    // app.screen实际上是一个rectangle的实例对象
+    // 可以自定义设置filterArea要显示的区域
+    con.filterArea = rect;
+    // con.filterArea = app.screen;
+
     app.stage.addChild(con);
 
-    var filter = new PIXI.Filter(null, fragmentShader);
+    var filter = new PIXI.Filter(null, fragmentShader); // 新建一个滤镜，手动添加片元着色器内容
     con.filters = [filter];
 
+    filter.uniforms.u_resolution[0] = app.screen.width;
+    filter.uniforms.u_resolution[1] = app.screen.height;
+
     app.ticker.add(function() {
+        // uniforms.u_mouse，是一个Float32Array类型的数组，长度为2，保存了鼠标全局x、y坐标
         var v2 = filter.uniforms.u_mouse;
         var global = app.renderer.plugins.interaction.mouse.global;
         v2[0] = global.x;
         v2[1] = global.y;
         filter.uniforms.u_mouse = v2;
 
-        v2 = filter.uniforms.u_resolution;
-        v2[0] = app.screen.width;
-        v2[1] = app.screen.height;
-        filter.uniforms.u_resolution = v2;
+        // uniforms.u_resolution，也是一个Float32Array类型的数组，长度为2
+        // 该demo中，由于渲染区域大小不变，可以在循环外设置u_resolution的值
+        // v2 = filter.uniforms.u_resolution;
+        // v2[0] = app.screen.width;
+        // v2[1] = app.screen.height;
+        // filter.uniforms.u_resolution = v2;
     });
 </script>
 </body>

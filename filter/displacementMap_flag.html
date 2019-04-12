@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+    var flag = new PIXI.Sprite.fromImage('../assets/flag.png');
+    flag.x = 50;
+    flag.y = 50;
+    app.stage.addChild(flag);
+
+    var displaceSprite = new PIXI.Sprite.fromImage('../assets/displacement_map_repeat.jpg');
+
+    // 纹理包装方式
+    // PIXI.WRAP_MODES.CLAMP：纹理uvs被夹紧
+    // PIXI.WRAP_MODES.REPEAT：纹理uvs平铺并重复
+    // PIXI.WRAP_MODES.MIRRORED_REPEAT：纹理uvs平铺并重复镜像
+    displaceSprite.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
+    var displaceFilter = new PIXI.filters.DisplacementFilter(displaceSprite);
+
+    // padding：过滤器的填充器。有些过滤器需要额外空间来进行呼吸，例如模糊。
+    // 增加此值将为应用过滤器的对象边界添加额外的宽度和高度
+    displaceFilter.padding = 100;
+    displaceSprite.position = flag.position;
+    app.stage.addChild(displaceSprite);
+
+    flag.filters = [displaceFilter];
+    displaceFilter.scale.x = 30;
+    displaceFilter.scale.y = 60;
+
+    app.ticker.add(function() {
+        displaceSprite.x+=1;
+        if(displaceSprite.x > displaceSprite.width) {
+            displaceSprite.x = 0;
+        }
+    });
+
+</script>
+</body>
+</html>

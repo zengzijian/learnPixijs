@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+</head>
+<body>
+<script>
+    var app = new PIXI.Application(400, 300);
+    document.body.appendChild(app.view);
+
+
+    var con = new PIXI.Container();
+    app.stage.addChild(con);
+
+    var items = [];
+    for (var i = 0; i < 20; i++) {
+        var item = new PIXI.Sprite.fromImage("../assets/maggot.png");
+        item.anchor.set(0.5);
+        item.x = Math.random() * app.screen.width;
+        item.y = Math.random() * app.screen.height;
+        item.scale.set(0.5 + Math.random()*0.3);
+
+        con.addChild(item);
+
+    }
+
+    var ring = new PIXI.Sprite.fromImage('../assets/ring.png');
+    ring.anchor.set(0.5);
+    ring.scale.set(0.5);
+    app.stage.addChild(ring);
+
+    // PIXI.filters.DisplacementFilter类使用指定纹理（称为位移映射）中的像素值来执行对象的位移
+    // 可以使用这个滤镜应用到所有领地（庄园？）的疯狂扭曲效果
+    // 目前，纹理的r属性用于偏移x，纹理的g属性用于偏移y
+    var displacementSprite = new PIXI.Sprite.fromImage('../assets/displace.png');
+    displacementSprite.anchor.set(0.5);
+    displacementSprite.scale.set(0.5);
+    var displacementFilter = new PIXI.filters.DisplacementFilter(displacementSprite);
+    displacementFilter.scale.x = 55; // scale如果设为正值，会将图像放大；如果设为负值，会将图像缩小
+    displacementFilter.scale.y = 55;
+    app.stage.addChild(displacementSprite);
+    con.filters = [displacementFilter];
+
+    var bg = new PIXI.Sprite.fromImage('../assets/bg_grass.jpg');
+    bg.width = app.screen.width;
+    bg.height = app.screen.height;
+    bg.alpha = 0.4; // 背景图添加在最后，会遮盖之前的元素，需要设置alpha值
+    con.addChild(bg);
+
+    app.stage.interactive = true;
+    app.stage.on('pointermove', onPointerMove);
+
+    function onPointerMove(e) {
+        // 通过鼠标的全局位置，更新ring和displaySprite的位置
+        displacementSprite.position.set(e.data.global.x-12, e.data.global.y);
+        ring.position.copy(displacementSprite.position);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../pixi.js"></script>
+    <script src="../lib/pixi-filters.js"></script>
+</head>
+<body>
+<script>
+    /**
+     * PIXI.filters默认的滤镜类型较少，通过添加pixi-filters.js插件，添加更多的filter
+     */
+
+    var app = new PIXI.Application(400, 300, {
+        antialias: true
+    });
+    document.body.appendChild(app.view);
+
+    var texture = new PIXI.Texture.fromImage('../assets/bunny.png');
+    // OutlineFilter(厚度，颜色)
+    var outlineFilter = new PIXI.filters.OutlineFilter(2, 0x99ff99);
+    // todo GlowFilter()参数的意义？？？
+    var glowFilter = new PIXI.filters.GlowFilter(16, 2, 1, 0xff9999, 0.5);
+
+    function filterOn() {
+        this.filters = [glowFilter];
+    }
+    function filterOff() {
+        this.filters = [outlineFilter];
+    }
+
+    for (var i = 0; i < 20; i++) {
+        var item = new PIXI.Sprite(texture);
+        item.x = Math.random() * app.screen.width;
+        item.y = Math.random() * app.screen.height;
+
+        item.scale.x = 0.4 + Math.random() * 1.2;
+        item.scale.y = 0.4 + Math.random() * 1.2;
+
+        // item.filters = [glowFilter];
+        item.interactive = true;
+        item.on("pointerover", filterOn)
+            .on("pointerout", filterOff);
+
+        filterOff.call(item);
+
+        app.stage.addChild(item);
+
+    }
+
+</script>
+</body>
+</html>
